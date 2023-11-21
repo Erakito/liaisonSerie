@@ -27,14 +27,22 @@
 #define FOSC 16000000 // Clock Speed
 #define BAUD 9600
 #define MYUBRR FOSC/16/BAUD-1
+int flag = 0;
 int main(void)
 {
   USART_Init(MYUBRR);
+  sei();
   while (1){
-    USART_Transmit('A');
-    USART_Transmit(10);
-    _delay_ms(100);
+    if (flag==1){
+        USART_Transmit(UDR0 + 1);
+        flag = 0;
+    }
+    _delay_ms(1);
   }
+}
+
+ISR(USART_RX_vect){
+  flag = 1;
 }
 
 void USART_Transmit(unsigned char data)
@@ -61,7 +69,7 @@ void USART_Init(unsigned int ubrr)
 UBRR0H = (unsigned char)(ubrr>>8);
 UBRR0L = (unsigned char)ubrr;
 //Enable receiver and transmitter */
-UCSR0B = (1<<RXEN0)|(1<<TXEN0);
+UCSR0B = (1<<RXEN0)|(1<<TXEN0)|(1<<RXCIE0);
 /* Set frame format: 8data, 2stop bit */
 UCSR0C = (1<<USBS0)|(3<<UCSZ00);
 }
