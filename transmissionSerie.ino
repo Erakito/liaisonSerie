@@ -45,6 +45,14 @@ ISR(USART_RX_vect){
   flag = 1;
 }
 
+void USART_puts(unsigned char *str)
+{
+do
+{
+USART_Transmit(*str);
+} while (*++str!=0);
+}
+
 void USART_Transmit(unsigned char data)
 {
 /* Wait for empty transmit buffer */
